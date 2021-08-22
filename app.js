@@ -19,6 +19,9 @@ app.use('/users', userRouter)
 const userTimingPreferenceRouter = require('./routes/userTimingPreferences')
 app.use('/userTimingPreference', userTimingPreferenceRouter)
 
+const suggestTimeRouter = require('./routes/suggestTime')
+app.use('/suggested-time', suggestTimeRouter)
+
 app.listen(9000, () => {
     console.log("Server started...")
 })
