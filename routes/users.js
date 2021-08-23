@@ -40,13 +40,13 @@ router.get('/:id', (req, res) => {
 router.post('/', async(req, res) => {
     // Validate request
     if (!req.body) {
-        return res.status(400).send({ message : "Time preferences are missing"})
+        return res.status(400).send({ message : "Body is missing"})
     }
 
     // new user
     const user = new User({
         name: req.body.name,
-        email: req.body.email
+        email: req.body.email ? req.body.email:''
     })
 
     try {
