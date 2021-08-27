@@ -4,14 +4,19 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon app.js"
+    "start": "nodemon app.js",
+    "test": "mocha --recursive --exit"
   },
   "author": "Divyanshu Thakur",
   "license": "ISC",
   "dependencies": {
+    "chai": "^4.3.4",
     "express": "^4.17.1",
+    "mocha": "^9.1.0",
+    "mockgoose": "^8.0.4",
     "mongodb": "^4.1.0",
-    "mongoose": "^5.13.7"
+    "mongoose": "^5.13.7",
+    "supertest": "^6.1.6"
   },
   "devDependencies": {
     "nodemon": "^2.0.12"

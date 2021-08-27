@@ -23,3 +23,6 @@ Query time preferences - [localhost:9000/userTimingPreference](http://localhost:
 Get free slots - [localhost:9000/suggested-time](http://localhost:9000/suggested-time)
 
 Postman collection - [getpostman/collections](https://www.getpostman.com/collections/57c9d079ed34f456532c)
+
+To dockerize the app
+`docker compose up`
