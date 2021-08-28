@@ -1,15 +1,15 @@
 const express = require('express')
-const mongoose = require('mongoose')
-const url = 'mongodb://localhost/Users'
-
 const app = express()
 
-mongoose.connect(url, {useNewUrlParser: true})
-const con = mongoose.connection
-
-con.on('open', () => {
-    console.log("Connected......")
-})
+if (!(process.env.NODE_ENV === 'test')) {
+    const dbConnect = require('./dbConnect.js')
+    dbConnect.connect('open', () => {
+        console.log("Connected......")
+    })
+    .catch(err => {
+        console.log("Error in db connection.. " + err)
+    })
+}
 
 app.use(express.json())
 

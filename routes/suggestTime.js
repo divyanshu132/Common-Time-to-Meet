@@ -91,7 +91,7 @@ const getFreeSlots = (schedule, freeSlots) => {
                 j++
             }
             // if startTime == dayStart then we'll have one slot namely -> [endTime, dayend]
-            else {
+            else if (endTime > freeSlots[j].start){
                 freeSlots[j].start = endTime
             }
         }
@@ -169,13 +169,16 @@ const getFreeTime = (schedule1, schedule2, duration, count, freeSlots1, freeSlot
             // if it falls in the current free slot choose this time as one of the options
             if (endTime <= slot.end && userTwoIsFree(freeSlots2, startTime, endTime)) {
                 res.slots.push({
-                    "start": new Date(startTime).toLocaleString(), 
-                    "end": new Date(endTime).toLocaleString()
+                    "start": new Date(startTime), 
+                    "end": new Date(endTime)
                 })
                 // add the remaining protion of first interval from the free slot to next iteration
                 if (endTime != slot.end) {
                     freeSlots1.splice(i+1, 0, {start: endTime, end: slot.end})
                 }
+            }
+            else if (endTime != slot.end) {
+                freeSlots1.splice(i+1, 0, {start: endTime, end: slot.end})
             }
         }
         return res
@@ -216,33 +219,39 @@ router.post('/', async(req, res) => {
     let schedule2 = req.body.userId2.calendars.primary.busy
 
     let usersArray = []
-    for (let id of users) {
-        await UserTimingPreference.findById(id).then((user) => {
-            if (!user) {
-                res.status(404).send({ message : "No user found with id "+ id})
-            }
-            else {
-                usersArray.push(user)
-            }
-        })
-        .catch (err => {
-            return res.status(500).send({ message: "Error retrieving user with id " + id})
-        })
+    if (process.env.NODE_ENV === 'test') {
+        usersArray.push(req.body.user1Details)
+        usersArray.push(req.body.user2Details)
+    }
+    else {
+        for (let id of users) {
+            await UserTimingPreference.findById(id).then((user) => {
+                if (!user) {
+                    res.status(404).send({ message : "No user found with id "+ id})
+                }
+                else {
+                    usersArray.push(user)
+                }
+            })
+            .catch (err => {
+                return res.status(500).send({ message: "Error retrieving user with id " + id})
+            })
+        }
     }
 
     let freeSlots1 = [{
-        start: usersArray[0].day_start_time.getTime(), 
-        end: usersArray[0].day_end_time.getTime()
+        start: new Date(usersArray[0].day_start_time).getTime(), 
+        end: new Date(usersArray[0].day_end_time).getTime()
     }]
     let freeSlots2 = [{
-        start: usersArray[1].day_start_time.getTime(), 
-        end: usersArray[1].day_end_time.getTime()
+        start: new Date(usersArray[1].day_start_time).getTime(), 
+        end: new Date(usersArray[1].day_end_time).getTime()
     }]
-    
+
     let freeSlots = getFreeTime(schedule1, schedule2, duration_mins, count,
                                 freeSlots1, freeSlots2, usersArray[0].timezone, usersArray[1].timezone)
     
-    if (freeSlots.length < 1) {
+    if (freeSlots && freeSlots.slots && freeSlots.slots.length < 1) {
         return res.status(409).send({ message: "No common slots found"})
     }
     else {
